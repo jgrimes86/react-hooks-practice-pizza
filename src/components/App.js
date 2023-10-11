@@ -7,11 +7,11 @@ function App() {
   const pizzaDatabase = "http://localhost:3001/pizzas"
   const [pizzas, setPizzas] = useState([]);
   const [pizzaDetails, setPizzaDetails] = useState({
+    id: "",
     topping: "",
     size: "",
     vegetarian: false,
   });
-  const [changingPizza, setChangingPizza] = useState([]);
 
   useEffect(() => {
     fetch(pizzaDatabase)
@@ -20,8 +20,8 @@ function App() {
   }, [])
 
   function fillPizzaForm(pizza) {
-    setChangingPizza(pizza)
     setPizzaDetails({
+      id: pizza.id,
       topping: pizza.topping,
       size: pizza.size,
       vegetarian: pizza.vegetarian
@@ -37,9 +37,16 @@ function App() {
   console.log(pizzaDetails)
 
   function updatePizza() {
+    fetch(pizzaDatabase+"/"+pizzaDetails.id, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(pizzaDetails)
+    })
     setPizzas(pizzas.map((pizza) => {
-      if (pizza.id === changingPizza.id) {
-        return {...pizzaDetails, "id": pizza.id}
+      if (pizza.id === pizzaDetails.id) {
+        return pizzaDetails
       } else {return pizza}
     }))
   }
